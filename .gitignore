@@ -1,0 +1,10 @@
+# Node / Vite
+node_modules/
+dist/
+*.log
+
+# Netlify & local env
+.netlify/
+.env
+.env.*
+.DS_Store

@@ -1,0 +1,224 @@
+:root{
+  --bg: #f6f7fb;
+  --bg-dark: #0e1016;
+  --panel: #ffffff;
+  --panel-dark: #151823;
+  --text: #1e293b;        /* darker for readability on light bubbles */
+  --text-muted: #55607a;
+  --text-dark: #e6eefc;   /* light text in dark mode */
+  --accent: #6a9cff;
+  --shadow: 0 8px 22px rgba(15,19,40,0.08);
+  --radius: 14px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: var(--bg-dark);
+    --panel: var(--panel-dark);
+    --text: var(--text-dark);
+    --text-muted: #9bb0d6;
+    --shadow: 0 10px 26px rgba(0,0,0,0.45);
+  }
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+}
+
+.app{
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  padding: 16px;
+  height: 100%;
+}
+
+/* Sidebar */
+.sidebar{
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo-orb{width:36px;height:36px;border-radius:50%;
+  background: radial-gradient(100% 100% at 30% 30%, #52f3b8, #6a9cff);
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.6), 0 6px 16px rgba(41,77,255,0.25);
+}
+.app-name{font-weight:700}
+.tagline{color:var(--text-muted);font-size:12px}
+.section-title{font-weight:600;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  background: linear-gradient(180deg,#fff,#f3f6ff);
+  border:1px solid #e5ecff;
+  color:#2b3450;
+  padding:7px 10px;border-radius:999px;cursor:pointer;
+  box-shadow: var(--shadow);
+  font-size:13px;
+}
+@media (prefers-color-scheme: dark){
+  .chip{background:#1a2030;border-color:#2a3550;color:#dce3f3}
+}
+.note{color:var(--text-muted);font-size:12px;line-height:1.4}
+
+/* Chat panel */
+.chat{
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* Sticky crisis banner */
+.crisis{
+  position: sticky; top:0; z-index:5;
+  padding: 10px 14px; background: #fff3cd; color:#5f4400;
+  border-bottom:1px solid #ffe59a; font-size:14px;
+}
+@media (prefers-color-scheme: dark){
+  .crisis{background:#332500;color:#ffd77d;border-bottom-color:#5b4700}
+}
+
+/* Messages stream (narrower column) */
+.messages{
+  padding: 14px;
+  overflow-y:auto; flex:1;
+  display:block;
+  max-width: 880px;            /* keeps column narrow on large screens */
+  margin: 0 auto;
+  background:
+    radial-gradient(80% 80% at 20% 0%, rgba(169,241,223,0.10), transparent),
+    radial-gradient(80% 80% at 80% 20%, rgba(106,156,255,0.10), transparent);
+}
+
+/* Rows & avatars */
+.row{display:flex;gap:10px;margin:8px 0;align-items:flex-end}
+.row.right{justify-content:flex-end}
+.row.left{justify-content:flex-start}
+.avatar{width:28px;height:28px}
+.orb,.avatar .orb{width:28px;height:28px;border-radius:50%;
+  background: radial-gradient(100% 100% at 30% 30%, #52f3b8, #6a9cff);
+  box-shadow: inset 0 0 6px rgba(255,255,255,0.6), 0 4px 12px rgba(41,77,255,0.25);
+}
+.user-avatar .user-dot{
+  width:28px;height:28px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#e7ecff;color:#2b3450;font-weight:700;font-size:12px;
+}
+@media (prefers-color-scheme: dark){
+ .user-avatar .user-dot{background:#1f2638;color:#cfe0ff}
+}
+
+/* Bubbles – smaller + proper contrast */
+.bubble{
+  max-width: 560px;             /* tighter */
+  padding:10px 12px;
+  border-radius:12px;
+  line-height:1.38;
+  font-size:14px;               /* smaller text */
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+.bubble.user{
+  background: linear-gradient(180deg, #ffffff, #f6f8ff);
+  border:1px solid #e5ecff;
+  color: #1f2937;               /* ensure dark text on light bg */
+}
+.bubble.bot{
+  background: linear-gradient(180deg, #ffffff, #f7fffd);
+  border:1px solid #dff3ed;
+  color: #16202e;
+}
+
+/* Dark mode bubble overrides for contrast */
+@media (prefers-color-scheme: dark){
+  .bubble.user{
+    background: linear-gradient(180deg, #1b2333, #162033);
+    border-color:#2a3650;
+    color: #e8f0ff;
+  }
+  .bubble.bot{
+    background: linear-gradient(180deg, #172231, #111a28);
+    border-color:#203041;
+    color: #e8f0ff;
+  }
+}
+
+.ts{color:var(--text-muted); font-size:11px; margin-top:4px}
+
+/* “Try this now” card – compact */
+/* “Try this now” card – compact and dark-friendly */
+.try-card{
+  display: inline-block;           /* no full-width stretching */
+  margin-top:8px;
+  padding:8px 10px;
+  border-radius:10px;
+  max-width: 480px;
+  font-size:13px;
+  line-height:1.35;
+  background: rgba(255,255,255,0.65);
+  border:1px solid #e6ebff;
+  color:#0f172a;                   /* dark text on light card */
+}
+
+/* Dark mode variant */
+@media (prefers-color-scheme: dark){
+  .try-card{
+    background: rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    color: inherit;                /* keep bubble text color */
+  }
+}
+
+.try-title{font-weight:700;margin-bottom:4px}
+.try-card ul{margin:0;padding-left:18px}
+.try-card li{margin:2px 0}
+
+/* Typing */
+.typing{color:var(--text-muted); padding:6px 12px; font-size:13px}
+
+/* Composer */
+.composer{
+  display:flex;gap:8px;align-items:flex-end;
+  border-top:1px solid rgba(0,0,0,0.06);
+  padding:10px;background:var(--panel);
+}
+.composer textarea{
+  flex:1;resize:none;min-height:42px;max-height:160px;
+  border-radius:10px;border:1px solid #d9e5ff;padding:9px 11px;
+  background:#fff;color:#1f2937; outline:none;font-size:14px;
+}
+@media (prefers-color-scheme: dark){
+  .composer textarea{background:#141a28;border-color:#2a3550;color:#e8f0ff}
+}
+.actions{display:flex;gap:6px;align-items:center}
+button{cursor:pointer;border:none;border-radius:10px;padding:8px 10px;font-size:14px}
+button.primary{
+  background: linear-gradient(180deg, #6a9cff, #4e7ef8); color:#fff; font-weight:700;
+}
+button.secondary{
+  background:#eef2ff;border:1px solid #d9e5ff;color:#2b3450;
+}
+button.icon{background:#eef2ff;border:1px solid #d9e5ff}
+@media (prefers-color-scheme: dark){
+  button.secondary, button.icon{background:#1a2030;border-color:#283453;color:#dce3f3}
+  button.primary{background: linear-gradient(180deg, #6a9cff, #3e6dec)}
+}
+
+/* Mobile */
+@media (max-width: 900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .messages{max-width: 100%}
+  .bubble{max-width: 86%}
+}
