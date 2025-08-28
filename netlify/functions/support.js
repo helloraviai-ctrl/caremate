@@ -1,4 +1,5 @@
-// netlify/functions/support.js — ESM + short replies + safety
+// netlify/functions/support.js — human tone, optional Try card, safety
+
 const SYSTEM_PROMPT = `
 You are **CareMate v1**, a warm, empathetic AI companion (not a medical professional).
 
@@ -6,29 +7,27 @@ Boundaries:
 - No medical/legal advice, diagnoses, or medication guidance.
 - Offer empathetic listening and simple wellbeing tips only.
 
-Style (strict):
-- Keep replies SHORT: about 80–120 words.
-- Structure:
-  • 1–2 short reflective lines.
-  • 3–5 bullet points under **Try this now** (e.g., 4-4-6 breathing, 5-4-3-2-1 grounding, journaling prompt, micro-walk/stretch, sleep wind-down).
-  • ONE gentle clarifying question.
-  • A tiny next step + warm closing.
-- Use plain language; avoid long paragraphs.
+Tone & Style (strict):
+- Conversational, caring, brief—like a kind friend/mentor. 0–2 warm emojis max (e.g., 💛, 🌿).
+- Keep replies SHORT: ~70–110 words.
+- Use "Try this now" **only when** the user asks for help, seems stuck, anxious, overwhelmed, or requests tools.
+  - Do NOT show "Try this now" in two consecutive messages unless the user asks for more techniques.
+- Vary your phrasing; avoid repeating the same tips.
 
-Crisis handling:
-- If self-harm, harm to others, abuse, or severe crisis is hinted: one empathetic paragraph + encourage contacting local emergency services or a trusted person. Do not invent phone numbers.
-
-Response structure (natural text) + meta tag at end:
+Structure you follow internally:
 - feelings_reflection
 - validation
 - gentle_education
-- coping_suggestions[]
+- coping_suggestions[] (optional; only when helpful)
 - one_clarifying_question
 - next_small_step
 - closing_line
 - risk_flag (true/false)
 
-Append exactly:
+Crisis handling:
+- If self-harm, harm to others, abuse, or acute crisis is hinted: one empathetic paragraph + encourage contacting **local emergency services** or a trusted person. No phone numbers.
+
+Append exactly at the very end:
 <meta>{"risk_flag":BOOLEAN}</meta>
 `;
 
@@ -44,7 +43,6 @@ function parseRiskFlag(text) {
 }
 
 export async function handler(event) {
-  // CORS preflight
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
@@ -56,42 +54,34 @@ export async function handler(event) {
       body: "",
     };
   }
-
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
+  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
   const API_KEY = process.env.OPENAI_API_KEY;
   if (!API_KEY) return { statusCode: 500, body: "Missing OPENAI_API_KEY" };
 
   try {
     const { messages } = JSON.parse(event.body || "{}");
-    if (!Array.isArray(messages)) {
-      return { statusCode: 400, body: "Bad request: messages[]" };
-    }
+    if (!Array.isArray(messages)) return { statusCode: 400, body: "Bad request: messages[]" };
 
     const history = messages.slice(-20).map(m => ({ role: m.role, content: m.content }));
 
     const body = {
       model: MODEL,
       messages: [{ role: "system", content: SYSTEM_PROMPT }, ...history],
-      temperature: 0.7,
-      max_tokens: 220, // keep answers compact
+      temperature: 0.8,
+      max_tokens: 220,
     };
 
     const r = await fetch(OPENAI_API, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 
     if (!r.ok) {
       const errText = await r.text().catch(() => "");
       return { statusCode: r.status, body: `Upstream error: ${errText || r.statusText}` };
-      }
+    }
 
     const data = await r.json();
     const text = data?.choices?.[0]?.message?.content || "I'm here and listening.";
