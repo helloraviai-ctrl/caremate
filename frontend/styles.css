@@ -3,9 +3,9 @@
   --bg-dark: #0e1016;
   --panel: #ffffff;
   --panel-dark: #151823;
-  --text: #1e293b;        /* darker for readability on light bubbles */
+  --text: #1e293b;
   --text-muted: #55607a;
-  --text-dark: #e6eefc;   /* light text in dark mode */
+  --text-dark: #e6eefc;
   --accent: #6a9cff;
   --shadow: 0 8px 22px rgba(15,19,40,0.08);
   --radius: 14px;
@@ -33,7 +33,7 @@ body{
 
 .app{
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px 1fr; /* desktop: 2 columns */
   gap: 16px;
   padding: 16px;
   height: 100%;
@@ -94,7 +94,7 @@ body{
   padding: 14px;
   overflow-y:auto; flex:1;
   display:block;
-  max-width: 880px;            /* keeps column narrow on large screens */
+  max-width: 880px;
   margin: 0 auto;
   background:
     radial-gradient(80% 80% at 20% 0%, rgba(169,241,223,0.10), transparent),
@@ -119,28 +119,26 @@ body{
  .user-avatar .user-dot{background:#1f2638;color:#cfe0ff}
 }
 
-/* Bubbles – smaller + proper contrast */
+/* Bubbles */
 .bubble{
-  max-width: 560px;             /* tighter */
+  max-width: 560px;
   padding:10px 12px;
   border-radius:12px;
   line-height:1.38;
-  font-size:14px;               /* smaller text */
+  font-size:14px;
   box-shadow: var(--shadow);
   color: var(--text);
 }
 .bubble.user{
   background: linear-gradient(180deg, #ffffff, #f6f8ff);
   border:1px solid #e5ecff;
-  color: #1f2937;               /* ensure dark text on light bg */
+  color: #1f2937;
 }
 .bubble.bot{
   background: linear-gradient(180deg, #ffffff, #f7fffd);
   border:1px solid #dff3ed;
   color: #16202e;
 }
-
-/* Dark mode bubble overrides for contrast */
 @media (prefers-color-scheme: dark){
   .bubble.user{
     background: linear-gradient(180deg, #1b2333, #162033);
@@ -156,30 +154,26 @@ body{
 
 .ts{color:var(--text-muted); font-size:11px; margin-top:4px}
 
-/* “Try this now” card – compact */
 /* “Try this now” card – compact and dark-friendly */
 .try-card{
-  display: inline-block;           /* no full-width stretching */
+  display:inline-block;
   margin-top:8px;
   padding:8px 10px;
   border-radius:10px;
-  max-width: 480px;
+  max-width:480px;
   font-size:13px;
   line-height:1.35;
   background: rgba(255,255,255,0.65);
   border:1px solid #e6ebff;
-  color:#0f172a;                   /* dark text on light card */
+  color:#0f172a;
 }
-
-/* Dark mode variant */
 @media (prefers-color-scheme: dark){
   .try-card{
     background: rgba(255,255,255,0.06);
     border:1px solid rgba(255,255,255,0.12);
-    color: inherit;                /* keep bubble text color */
+    color: inherit;
   }
 }
-
 .try-title{font-weight:700;margin-bottom:4px}
 .try-card ul{margin:0;padding-left:18px}
 .try-card li{margin:2px 0}
@@ -187,7 +181,7 @@ body{
 /* Typing */
 .typing{color:var(--text-muted); padding:6px 12px; font-size:13px}
 
-/* Composer */
+/* Composer (desktop) */
 .composer{
   display:flex;gap:8px;align-items:flex-end;
   border-top:1px solid rgba(0,0,0,0.06);
@@ -197,30 +191,82 @@ body{
   flex:1;resize:none;min-height:42px;max-height:160px;
   border-radius:10px;border:1px solid #d9e5ff;padding:9px 11px;
   background:#fff;color:#1f2937; outline:none;font-size:14px;
+  min-width:0; /* important for mobile flexbox */
 }
 @media (prefers-color-scheme: dark){
   .composer textarea{background:#141a28;border-color:#2a3550;color:#e8f0ff}
 }
 .actions{display:flex;gap:6px;align-items:center}
 button{cursor:pointer;border:none;border-radius:10px;padding:8px 10px;font-size:14px}
-button.primary{
-  background: linear-gradient(180deg, #6a9cff, #4e7ef8); color:#fff; font-weight:700;
-}
-button.secondary{
-  background:#eef2ff;border:1px solid #d9e5ff;color:#2b3450;
-}
-button.icon{background:#eef2ff;border:1px solid #d9e5ff}
+button.primary{ background: linear-gradient(180deg, #6a9cff, #4e7ef8); color:#fff; font-weight:700; }
+button.secondary{ background:#eef2ff;border:1px solid #d9e5ff;color:#2b3450; }
+button.icon{ background:#eef2ff;border:1px solid #d9e5ff }
 @media (prefers-color-scheme: dark){
   button.secondary, button.icon{background:#1a2030;border-color:#283453;color:#dce3f3}
   button.primary{background: linear-gradient(180deg, #6a9cff, #3e6dec)}
 }
 
-/* Mobile */
-@media (max-width: 900px){
-  .app{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .messages{max-width: 100%}
-  .bubble{max-width: 86%}
+/* ===== MOBILE/TABLET BEHAVIOR ===== */
+
+/* Hamburger & close buttons default hidden on desktop */
+.mobile-toggle{ display:none; }
+.close-side{ display:none; }
+
+/* Sidebar becomes a drawer on <=1024px */
+@media (max-width: 1024px){
+  .app{ grid-template-columns: 1fr; }     /* main column only */
+  .messages{ max-width: 100%; }
+  .bubble{ max-width: 88%; }
+
+  .sidebar{
+    position: fixed;
+    top: 0; left: 0;
+    height: 100%;
+    width: min(86vw, 340px);
+    transform: translateX(-100%);         /* hidden off-screen */
+    transition: transform .25s ease;
+    z-index: 40;
+    overflow: auto;
+  }
+  .sidebar[data-open="true"]{ transform: translateX(0); }
+
+  .mobile-toggle{
+    position: fixed;
+    top: 12px; left: 12px;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: none; border-radius: 10px;
+    background: #eef2ff; color: #2b3450;
+    box-shadow: var(--shadow);
+  }
+  .close-side{
+    display: inline-block;
+    position: absolute;
+    top: 10px; right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  .backdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    backdrop-filter: blur(2px);
+    z-index: 35;
+    display: none;
+  }
+  .sidebar[data-open="true"] ~ .backdrop{ display: block; }
+}
+
+/* Dark theme for the hamburger in mobile */
+@media (max-width: 1024px) and (prefers-color-scheme: dark){
+  .mobile-toggle{ background:#1a2030; color:#dce3f3; }
 }
 
 /* Keep the composer visible and safe on phones */
@@ -231,33 +277,14 @@ button.icon{background:#eef2ff;border:1px solid #d9e5ff}
   padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
-/* Let the textarea actually shrink/grow inside flex */
-.composer textarea{
-  min-width: 0;  /* important for mobile flexbox */
-}
-
-/* MOBILE LAYOUT: stack input above buttons */
+/* MOBILE: stack input above buttons */
 @media (max-width: 640px){
-  .composer{
-    flex-direction: column;         /* stack */
-    align-items: stretch;
-    gap: 8px;
-  }
-  .composer textarea{
-    flex: 1 1 auto;
-    width: 100%;                    /* full-width input on mobile */
-    min-height: 44px;
-  }
-  .actions{
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 6px;
-  }
+  .composer{ flex-direction: column; align-items: stretch; gap: 8px; }
+  .composer textarea{ width: 100%; min-height: 44px; }
+  .actions{ width: 100%; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; }
 }
 
-/* Very narrow phones: hide non-essential buttons */
+/* Tiny phones: hide less-essential buttons */
 @media (max-width: 380px){
-  .actions .secondary{ display: none; }  /* hides Clear/Export, keeps mic/voice/Send */
+  .actions .secondary{ display: none; }
 }
