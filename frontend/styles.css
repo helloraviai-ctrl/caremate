@@ -222,3 +222,42 @@ button.icon{background:#eef2ff;border:1px solid #d9e5ff}
   .messages{max-width: 100%}
   .bubble{max-width: 86%}
 }
+
+/* Keep the composer visible and safe on phones */
+.composer{
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Let the textarea actually shrink/grow inside flex */
+.composer textarea{
+  min-width: 0;  /* important for mobile flexbox */
+}
+
+/* MOBILE LAYOUT: stack input above buttons */
+@media (max-width: 640px){
+  .composer{
+    flex-direction: column;         /* stack */
+    align-items: stretch;
+    gap: 8px;
+  }
+  .composer textarea{
+    flex: 1 1 auto;
+    width: 100%;                    /* full-width input on mobile */
+    min-height: 44px;
+  }
+  .actions{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px;
+  }
+}
+
+/* Very narrow phones: hide non-essential buttons */
+@media (max-width: 380px){
+  .actions .secondary{ display: none; }  /* hides Clear/Export, keeps mic/voice/Send */
+}
